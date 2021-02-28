@@ -1,0 +1,14 @@
+{
+  "domain": "pixometer",
+  "name": "Pixometer",
+  "documentation": "",
+  "dependencies": [],
+  "config_flow": false,
+  "codeowners": [
+    "@realthk"
+  ],
+  "requirements": [
+    "requests"
+  ],
+  "version": "0.1.0"  
+}
