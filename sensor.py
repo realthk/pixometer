@@ -149,7 +149,7 @@ class Meter:
         for key, value in data.items():
             setattr(self, key, value)
 
-class Reading: 
+class Reading:
     def __init__(self, data):
         for d in ['resource_id', 'reading_date', 'value', 'meter' ]:
             setattr(self, d, data[d])
@@ -211,7 +211,7 @@ class PixometerSensor(Entity):
     @property
     def icon(self):
         """Return icon based on physical_medium."""
-        return self._icon        
+        return self._icon
 
     def update(self):
         """Fetch new state data for the sensor.
@@ -235,14 +235,15 @@ class PixometerSensor(Entity):
                 self._icon = "mdi:water-pump"
                 self._device_class = "gas"
                 self._unit = "m³"
-            
-            self._attributes = { 
+
+            self._attributes = {
                 'last_reading'      : self._meter.readings[0].reading_date,
                 'appereance'        : self._meter.appearance,
                 'physical_medium'   : self._meter.physical_medium,
                 'created'           : self._meter.created,
                 'state_class'       : 'total_increasing',
                 'device_class'      : self._device_class,
+                'last_reset'        : None,
                 'native_unit_of_measurement' : self._unit,
                 }
             if self._meter.label!=None:
