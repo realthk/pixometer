@@ -243,7 +243,6 @@ class PixometerSensor(Entity):
                 'created'           : self._meter.created,
                 'state_class'       : 'total_increasing',
                 'device_class'      : self._device_class,
-                'last_reset'        : None,
                 'native_unit_of_measurement' : self._unit,
                 }
             if self._meter.label!=None:
