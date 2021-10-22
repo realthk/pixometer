@@ -99,7 +99,8 @@ class PixometerWrapper:
                         m.readings.append(reading)
 
             for m in self._meters:
-                _LOGGER.debug(m.meter_id+": "+m.readings[0].reading_date+": "+m.readings[0].value)
+                if len(m.readings)>0:
+                    _LOGGER.debug(m.meter_id+": "+m.readings[0].reading_date+": "+m.readings[0].value)
         else:
             _LOGGER.warning("No readings data from Pixometer")
         return True
@@ -163,12 +164,15 @@ class PixometerSensor(Entity):
         self._wrapper = wrapper
         self._attributes = {}
         self._data = {}
+        self._icon = None
+        self._device_class = None
+        self._unit = None
         self.update()
 
     @property
     def name(self):
         """Return the name of the sensor."""
-        return f'{self._meter.meter_id} mérőóra'
+        return f'pixometer_{self._meter.meter_id}'
 
     @property
     def unique_id(self):
@@ -207,13 +211,7 @@ class PixometerSensor(Entity):
     @property
     def icon(self):
         """Return icon based on physical_medium."""
-        if self._meter.physical_medium=="electricity":
-            return "mdi:flash"
-        if self._meter.physical_medium=="gas":
-            return "mdi:radiator"
-        if self._meter.physical_medium=="water":
-            return "mdi:water-pump"
-        return None        
+        return self._icon        
 
     def update(self):
         """Fetch new state data for the sensor.
@@ -223,11 +221,29 @@ class PixometerSensor(Entity):
         self._wrapper.getReadings()
         if len(self._meter.readings):
             self._state = self._meter.readings[0].value
+
+            """Set icon based on physical_medium."""
+            if self._meter.physical_medium=="electricity":
+                self._icon = "mdi:flash"
+                self._device_class = "energy"
+                self._unit = "kWh"
+            if self._meter.physical_medium=="gas":
+                self._icon = "mdi:radiator"
+                self._device_class = "gas"
+                self._unit = "m³"
+            if self._meter.physical_medium=="water":
+                self._icon = "mdi:water-pump"
+                self._device_class = "gas"
+                self._unit = "m³"
+            
             self._attributes = { 
                 'last_reading'      : self._meter.readings[0].reading_date,
                 'appereance'        : self._meter.appearance,
                 'physical_medium'   : self._meter.physical_medium,
                 'created'           : self._meter.created,
+                'state_class'       : 'total_increasing',
+                'device_class'      : self._device_class,
+                'native_unit_of_measurement' : self._unit,
                 }
             if self._meter.label!=None:
                 self._attributes['label']=self._meter.label
@@ -239,8 +255,3 @@ class PixometerSensor(Entity):
                 self._attributes['address']=self._meter.address
             if self._meter.location_in_building!=None:
                 self._attributes['location_in_building']=self._meter.location_in_building
-
-
-
-
-
