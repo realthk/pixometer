@@ -81,7 +81,8 @@ class PixometerWrapper:
         if self._lastUpdate!=None and self._lastUpdate+SCAN_INTERVAL>datetime.now():
             _LOGGER.debug('Last reading was recently ('+str(self._lastUpdate)+')')
             return True
-        self.getToken()
+        if not self.getToken():
+            return False
         get_params = {'page_size': num}
         response = requests.get(self.base_url+"/readings/", headers=self.headers, params=get_params)
         if not response or not len(response.content):
@@ -190,7 +191,7 @@ class PixometerSensor(Entity):
         return self._state
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return device specific state attributes."""
         return self._attributes
 
